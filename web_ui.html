@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenClaw Install Coach</title>
+    <style>
+      :root {
+        --bg: #f7efe3;
+        --paper: rgba(255, 250, 243, 0.88);
+        --ink: #19323c;
+        --muted: #5f7078;
+        --brand: #ff7f50;
+        --brand-deep: #d25b2d;
+        --accent: #2aa198;
+        --line: rgba(25, 50, 60, 0.12);
+        --shadow: 0 24px 80px rgba(77, 56, 36, 0.18);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(255, 127, 80, 0.28), transparent 28rem),
+          radial-gradient(circle at bottom right, rgba(42, 161, 152, 0.22), transparent 30rem),
+          linear-gradient(160deg, #f8f1e6 0%, #f3e6d4 52%, #efe6dc 100%);
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        z-index: 0;
+        border-radius: 999px;
+        filter: blur(8px);
+        opacity: 0.55;
+      }
+
+      body::before {
+        width: 18rem;
+        height: 18rem;
+        top: -4rem;
+        right: -5rem;
+        background: rgba(255, 127, 80, 0.24);
+      }
+
+      body::after {
+        width: 16rem;
+        height: 16rem;
+        bottom: -5rem;
+        left: -4rem;
+        background: rgba(42, 161, 152, 0.2);
+      }
+
+      .shell {
+        position: relative;
+        z-index: 1;
+        width: min(980px, calc(100vw - 24px));
+        margin: 24px auto;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 28px;
+        overflow: hidden;
+        backdrop-filter: blur(18px);
+        background: var(--paper);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 28px 28px 18px;
+        background:
+          linear-gradient(135deg, rgba(255, 127, 80, 0.18), rgba(255, 255, 255, 0.08)),
+          linear-gradient(120deg, rgba(42, 161, 152, 0.12), transparent 56%);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .title {
+        margin: 0;
+        font-size: clamp(26px, 4vw, 42px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+      }
+
+      .subtitle {
+        margin: 10px 0 0;
+        max-width: 42rem;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      .badge {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(25, 50, 60, 0.08);
+        font-size: 13px;
+        color: var(--ink);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        min-height: 72vh;
+      }
+
+      .sidebar {
+        padding: 22px;
+        border-right: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      .sidebar h2 {
+        margin: 0 0 8px;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .panel {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(25, 50, 60, 0.08);
+      }
+
+      .panel strong,
+      .panel span {
+        display: block;
+      }
+
+      .panel strong {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .panel span {
+        font-size: 17px;
+      }
+
+      .reset {
+        width: 100%;
+        margin-top: 16px;
+        border: 0;
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        cursor: pointer;
+        border: 1px solid rgba(25, 50, 60, 0.1);
+        transition: transform 160ms ease, border-color 160ms ease;
+      }
+
+      .reset:hover {
+        transform: translateY(-1px);
+        border-color: rgba(210, 91, 45, 0.38);
+      }
+
+      .chat {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .messages {
+        flex: 1;
+        padding: 26px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .message {
+        max-width: min(80ch, 82%);
+        padding: 14px 16px;
+        border-radius: 20px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        animation: float-in 220ms ease;
+      }
+
+      .message.user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #ff855a, #ff9d77);
+        color: white;
+        border-bottom-right-radius: 8px;
+      }
+
+      .message.assistant {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(25, 50, 60, 0.08);
+        border-bottom-left-radius: 8px;
+      }
+
+      .message.system {
+        align-self: center;
+        background: rgba(42, 161, 152, 0.12);
+        color: var(--ink);
+        border: 1px dashed rgba(42, 161, 152, 0.28);
+      }
+
+      .composer {
+        padding: 18px 22px 22px;
+        border-top: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.48);
+      }
+
+      .hint {
+        margin: 0 0 10px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 124px;
+        gap: 12px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 104px;
+        max-height: 240px;
+        resize: vertical;
+        border: 1px solid rgba(25, 50, 60, 0.14);
+        border-radius: 18px;
+        padding: 15px 16px;
+        font: inherit;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.94);
+        outline: none;
+      }
+
+      textarea:focus {
+        border-color: rgba(42, 161, 152, 0.54);
+        box-shadow: 0 0 0 4px rgba(42, 161, 152, 0.12);
+      }
+
+      .send {
+        border: 0;
+        border-radius: 18px;
+        padding: 14px 16px;
+        font: inherit;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--brand-deep), var(--brand));
+        box-shadow: 0 14px 30px rgba(210, 91, 45, 0.24);
+        transition: transform 160ms ease, opacity 160ms ease;
+      }
+
+      .send:hover {
+        transform: translateY(-1px);
+      }
+
+      .send:disabled {
+        opacity: 0.62;
+        cursor: wait;
+        transform: none;
+      }
+
+      .status {
+        min-height: 1.4em;
+        margin: 0 0 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .error {
+        color: #9e2d2d;
+      }
+
+      @keyframes float-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 820px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .message {
+          max-width: 100%;
+        }
+
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <h1 class="title">OpenClaw 安装小教练</h1>
+        <p class="subtitle">
+          这个页面会读取本地 README，然后一步一步教用户安装 OpenClaw。
+          适合把终端输出直接粘回来继续问。
+        </p>
+        <div class="badges">
+          <span class="badge">README 驱动</span>
+          <span class="badge">DeepSeek 内核</span>
+          <span class="badge">适合小白</span>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="sidebar">
+          <h2>Session</h2>
+          <div class="panel">
+            <strong>Platform</strong>
+            <span id="platform">-</span>
+          </div>
+          <div class="panel">
+            <strong>Stage</strong>
+            <span id="stage">welcome</span>
+          </div>
+          <button class="reset" id="resetBtn">重置对话</button>
+        </aside>
+
+        <section class="chat">
+          <div class="messages" id="messages"></div>
+          <div class="composer">
+            <p class="status" id="status"></p>
+            <p class="hint">按 Enter 发送，Shift + Enter 换行。</p>
+            <div class="row">
+              <textarea id="input" placeholder="比如：请一步一步教我安装 OpenClaw。&#10;&#10;或者把终端报错粘贴到这里。"></textarea>
+              <button class="send" id="sendBtn">发送</button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const messagesEl = document.getElementById("messages");
+      const statusEl = document.getElementById("status");
+      const inputEl = document.getElementById("input");
+      const sendBtn = document.getElementById("sendBtn");
+      const stageEl = document.getElementById("stage");
+      const platformEl = document.getElementById("platform");
+      const resetBtn = document.getElementById("resetBtn");
+
+      function setStatus(text, isError = false) {
+        statusEl.textContent = text || "";
+        statusEl.className = isError ? "status error" : "status";
+      }
+
+      function renderMessages(messages) {
+        messagesEl.innerHTML = "";
+        if (!messages.length) {
+          const starter = document.createElement("div");
+          starter.className = "message system";
+          starter.textContent = "从一句简单的话开始，比如：请一步一步教我安装 OpenClaw。";
+          messagesEl.appendChild(starter);
+        }
+
+        for (const item of messages) {
+          const bubble = document.createElement("div");
+          bubble.className = `message ${item.role}`;
+          bubble.textContent = item.content;
+          messagesEl.appendChild(bubble);
+        }
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      async function refreshState() {
+        const response = await fetch("/api/state");
+        const payload = await response.json();
+        platformEl.textContent = payload.platform || "-";
+        stageEl.textContent = payload.stage || "welcome";
+        renderMessages(payload.messages || []);
+      }
+
+      async function sendMessage() {
+        const message = inputEl.value.trim();
+        if (!message) return;
+
+        sendBtn.disabled = true;
+        setStatus("教练正在整理下一步...");
+
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+          });
+          const payload = await response.json();
+          if (!response.ok) {
+            throw new Error(payload.error || "请求失败");
+          }
+
+          inputEl.value = "";
+          stageEl.textContent = payload.stage || "welcome";
+          renderMessages(payload.messages || []);
+          setStatus("");
+        } catch (error) {
+          setStatus(error.message || "请求失败", true);
+        } finally {
+          sendBtn.disabled = false;
+          inputEl.focus();
+        }
+      }
+
+      inputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+
+      sendBtn.addEventListener("click", sendMessage);
+
+      resetBtn.addEventListener("click", async () => {
+        try {
+          const response = await fetch("/api/reset", { method: "POST" });
+          const payload = await response.json();
+          stageEl.textContent = payload.stage || "welcome";
+          renderMessages(payload.messages || []);
+          setStatus("对话已重置。");
+        } catch (error) {
+          setStatus("重置失败。", true);
+        }
+      });
+
+      refreshState().catch(() => {
+        setStatus("无法加载会话状态。", true);
+      });
+    </script>
+  </body>
+</html>
