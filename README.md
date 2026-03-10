@@ -1,6 +1,7 @@
 # openclwd
 
 一个免费的 `OpenClaw 安装陪练 Agent`。
+<img width="1360" height="782" alt="Screenshot 2026-03-10 at 5 13 41 PM" src="https://github.com/user-attachments/assets/04fe4eb5-b39d-47fa-8ba2-a66cb19e4eca" />
 
 如果你也觉得“AI 都还没开口，安装服务先开价”这件事多少带点行为艺术，这个小项目就是来把这段流程免费化、傻瓜化、顺手阴阳怪气化的。
 
@@ -96,29 +97,6 @@ DEEPSEEK_BASE_URL=https://api.deepseek.com
 python3 agent.py --self-check
 ```
 
-## 适合上传到 GitHub 的内容
-
-建议保留这些：
-
-- `agent.py`
-- `deepseek_client.py`
-- `readme_kb.py`
-- `prompts.py`
-- `state_store.py`
-- `web_ui.html`
-- `OPENCLAW_README.md`
-- `.env.example`
-- `.gitignore`
-- `README.md`
-
-不要上传这些：
-
-- `.env`
-- `.install_coach_state.json`
-- `__pycache__/`
-- `.openclaw-cli/`
-- `.openclaw-home/`
-- 任何你本机生成的缓存、密钥、临时文件
 
 ## 一个很诚实的商业对比
 
